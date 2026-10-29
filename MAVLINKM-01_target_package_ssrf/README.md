@@ -9,7 +9,8 @@
 | **Reviewed at** | `mavlink-military` @ `6375c34` (2026-10-28), public draft |
 | **Interaction** | zero-click: a `TARGET` arriving at a consumer that resolves the package |
 | **Delivery class** | push (the message carries the endpoint; no handshake) |
-| **Status** | design-level, confirmed by schema reading; no shipped consumer tested |
+| **Verified** | ✅ end-to-end: a packed TARGET drives a spec-faithful consumer to GET an internal endpoint and exfiltrate its contents ([poc/](poc/)) |
+| **Status** | schema design gap; mechanism reproduced against a reference consumer, no shipped GCS tested |
 | **Fix** | upstream proposal in [PROPOSAL.md](PROPOSAL.md) |
 
 ## Summary
@@ -148,11 +149,35 @@ is in scope now and out of scope after the freeze without a breaking revision.
 
 ## Reproduction
 
-No runtime PoC: the finding is the schema. To confirm, read `TARGET` in
-`military.xml` (fields at 1855-1866, enum at 601-606, hash at 1838) and note the
-absence of any validation rule for these fields in `military.xml` or
-`docs/en/services/`. A consumer PoC would implement the field as written and
-observe the outbound request to a sender-chosen host; it is not built here
-because no sink beyond "the consumer's HTTP client" is specified to attack.
+[poc/ssrf_e2e.py](poc/ssrf_e2e.py) demonstrates it end-to-end, entirely on
+`127.0.0.1`:
+
+```sh
+cd poc
+pip install pymavlink          # military_dialect.py is committed; regenerate with generate_dialect.sh
+python3 -I ssrf_e2e.py
+```
+
+Expected:
+
+```
+internal service (should be unreachable by the drone) on 127.0.0.1:NNNNN
+malicious TARGET frame: 198 bytes, from sysid 42
+  consumer builds URL from TARGET fields: http://127.0.0.1:NNNNN/latest/meta-data/secret
+internal service was reached by the consumer: [('127.0.0.1', '/latest/meta-data/secret')]
+consumer exfiltrated: 'INTERNAL-ONLY: ...'
+RESULT: SSRF CONFIRMED — the TARGET sender chose the consumer's outbound request
+```
+
+The PoC builds a real TARGET message, packs it, and hands the frame to
+`consume_target()`, which implements the package-retrieval fields exactly as
+`military.xml` describes them (IPv4 endpoint unpacked as `(a<<24)|(b<<16)|(c<<8)|d`,
+`package_transport` → scheme, `package_path` as the request path) and performs the
+GET. The consumer is a faithful reference, not a shipped GCS: it shows that a
+conforming implementation is routed to a sender-chosen host, port, and path. The
+`package_path` traversal and the unverified `package_id_hash` are read directly
+from the schema (`military.xml` fields at 1855-1866, enum at 601-606, hash at
+1838); no validation rule for these fields exists in `military.xml` or
+`docs/en/services/`.
 
 The upstream fix proposal is in [PROPOSAL.md](PROPOSAL.md).

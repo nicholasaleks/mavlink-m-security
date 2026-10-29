@@ -38,7 +38,7 @@ vendor GCS implementation, since the dialect is not an implementation.
 
 | ID | Sev | CWE | Sink / mechanism | Verified | Fix |
 |---|---|---|---|---|---|
-| [MAVLINKM-01](MAVLINKM-01_target_package_ssrf/) | 🟠 HIGH | 918/22/494 | `TARGET` carries drone-supplied IP+port+path → consumer SSRF + traversal fetch; integrity is a sender-supplied uint32 | schema | [proposal](MAVLINKM-01_target_package_ssrf/PROPOSAL.md) |
+| [MAVLINKM-01](MAVLINKM-01_target_package_ssrf/) | 🟠 HIGH | 918/22/494 | `TARGET` carries drone-supplied IP+port+path → consumer SSRF + traversal fetch; integrity is a sender-supplied uint32 | ✅ reproduced (E2E SSRF) | [proposal](MAVLINKM-01_target_package_ssrf/PROPOSAL.md) |
 | [MAVLINKM-02](MAVLINKM-02_signing_replay_state_lockout/) | 🟠 HIGH | 294/400 | Signing replay-state poisoned → genuine stops (ABORT/DISARM) dropped as replay | ✅ reproduced (pymavlink + C lib) | pin bump (pymavlink #1300); C needs upper bound |
 | [MAVLINKM-03](MAVLINKM-03_payload_catalogue_crc_forgery/) | 🟠 HIGH | 345/354/494 | Catalogue bound to signed status only by a forgeable CRC-32 → network/file-server attacker swaps catalogue content | ✅ reproduced (CRC collision) | add `catalogue_sha256` |
 | [MAVLINKM-04](MAVLINKM-04_reference_esad_handler_unsafe/) | 🟠 HIGH | 1284/697 | Reference ESAD handler arms on any nonzero; regeneration inverts DISARM→arm | ✅ reproduced (running code) | exact-match enum switch |

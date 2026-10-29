@@ -8,3 +8,4 @@ venv/
 *.dSYM/
 /MAVLINKM-04_reference_esad_handler_unsafe/poc/h_*
 /MAVLINKM-04_reference_esad_handler_unsafe/poc/lx_*
+DISCLOSURE_NOTE.md
