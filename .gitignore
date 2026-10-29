@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+.DS_Store
+# built PoC binaries
+*.o
+*.dSYM/
+/MAVLINKM-04_reference_esad_handler_unsafe/poc/h_*
+/MAVLINKM-04_reference_esad_handler_unsafe/poc/lx_*

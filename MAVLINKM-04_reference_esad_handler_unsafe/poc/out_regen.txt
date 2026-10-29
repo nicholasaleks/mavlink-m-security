@@ -1,0 +1,20 @@
+[sweep] regen (ESAD_ARMING CRC_EXTRA 3, Hamming codewords)
+[sweep] firmware ARMED status value = 51, DISARMED = 15
+[sweep] arming_request values that ARM a disarmed ESAD: 255/256
+[sweep] arming_request values that DISARM an armed ESAD: 0 (1/256)
+[named] start=DISARMED send MAVLINK_M_ESAD_REQUEST_ARM (15) -> g_arming_status=51 (ARMED), LED=1, ESAD_STATE.arming_status=51
+[named] start=ARMED send MAVLINK_M_ESAD_REQUEST_DISARM (51) -> g_arming_status=51 (ARMED), LED=1, ESAD_STATE.arming_status=51
+[bitflip] DISARM codeword 51 with 1-3 bits changed: 92/92 leave/turn the ESAD ARMED (spec: refuse all, record as stop)
+[authz] unsigned, sysid 255 via FC link               frame_len= 28 incompat=0x00 -> ARMED (accepted)
+[authz] unsigned, arbitrary sysid 77/comp 1           frame_len= 28 incompat=0x00 -> ARMED (accepted)
+[authz] signed with unknown key                       frame_len= 41 incompat=0x01 -> ARMED (accepted)
+[authz] signed, signature bytes trashed               frame_len= 41 incompat=0x01 -> ARMED (accepted)
+[authz] ARM with esad_id=0 (spec: reject)             frame_len= 28 incompat=0x00 -> ARMED (accepted)
+[authz] ARM with store_id=200 (no such store)         frame_len= 29 incompat=0x00 -> ARMED (accepted)
+[authz] ARM with time_usec=0                          frame_len= 28 incompat=0x00 -> ARMED (accepted)
+[authz] ARM with time_usec=UINT64_MAX (far future)    frame_len= 28 incompat=0x00 -> ARMED (accepted)
+[authz] ARM via USB VCP link (bypasses PX4)           frame_len= 28 incompat=0x00 -> ARMED (accepted)
+[stopwins] DISARM(t=2000) then stale ARM(t=1000): ARMED (stale start overrides stop)
+[replay] byte-identical replay of earlier ARM after DISARM: ARMED
+[ack] MAVLINK_M_ACK frames emitted for 256 ESAD_ARMING requests (incl. unlisted values): 0
+[xver] current-spec ESAD_ARMING (CRC_EXTRA 3, DISARM=51) into this firmware: ACCEPTED, state=ARMED
